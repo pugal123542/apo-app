@@ -2,224 +2,221 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Ultimate IQ Quiz</title>
+<title>Qurix Quiz Pro</title>
 <style>
-*{box-sizing:border-box;font-family:Arial}
-body{
-margin:0;height:100vh;display:flex;justify-content:center;align-items:center;
-background:linear-gradient(120deg,#020617,#0f172a);
-color:white;overflow:hidden;
-position:relative;
-}
-body::before{
-content:"";position:absolute;width:200%;height:200%;
-background-image:radial-gradient(circle,#ffffff33 1px,transparent 1px);
-background-size:40px 40px;animation:particles 20s linear infinite;
-z-index:0;
-}
+*{box-sizing:border-box;font-family:Arial;}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;}
+body{display:flex;justify-content:center;align-items:center;background:linear-gradient(120deg,#020617,#0f172a);color:white;position:fixed;top:0;left:0;}
+body::before{content:"";position:absolute;width:200%;height:200%;background-image:radial-gradient(circle,#ffffff33 1px,transparent 1px);background-size:60px 60px;animation:particles 30s linear infinite;z-index:-1;}
 @keyframes particles{0%{transform:translateY(0)}100%{transform:translateY(-200px)}}
-.card{
-position:relative;backdrop-filter:blur(15px);background:rgba(255,255,255,0.08);
-border:1px solid rgba(255,255,255,0.15);padding:30px;border-radius:20px;
-width:360px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.6);z-index:1;
-}
-input{width:100%;padding:10px;margin-top:10px;border:none;border-radius:8px;background:rgba(255,255,255,0.1);color:white;}
-input::placeholder{color:#ccc;}
-button{margin-top:12px;padding:12px;width:100%;border:none;border-radius:10px;background:#22c55e;color:white;font-size:16px;cursor:pointer;transition:0.2s;}
-button:hover{transform:scale(1.05);background:#16a34a;}
-.option{background:rgba(255,255,255,0.1);margin-top:10px;padding:12px;border-radius:10px;cursor:pointer;transition:0.2s;}
+.card{max-width:400px;width:95%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:30px;border-radius:20px;backdrop-filter:blur(15px);background:rgba(255,255,255,0.08);box-shadow:0 10px 40px rgba(0,0,0,0.6);text-align:center;position:relative;}
+input{width:100%;padding:12px;margin-top:6px;border:none;border-radius:8px;font-size:16px;overflow-x:auto;white-space:nowrap;text-overflow:ellipsis;}
+input:focus{outline:2px solid #22c55e;}
+#login button{background:#22c55e;color:white;width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px;font-size:16px;cursor:pointer;transition:0.2s;}
+#login button:hover{transform:translateY(-2px);}
+.option{width:100%;padding:14px;margin:6px 0;border-radius:12px;text-align:center;cursor:pointer;transition:0.2s;background:rgba(255,255,255,0.1);}
 .option:hover{background:rgba(255,255,255,0.2);}
-.option.selected{background:#22c55e;color:white;}
-#timer{font-size:22px;color:#facc15;margin-bottom:10px;}
-.progress{height:8px;background:#334155;border-radius:10px;margin-top:10px;overflow:hidden;}
+.option.correct{background:#22c55e;color:white;}
+#timer{font-size:24px;width:100%;text-align:center;margin-bottom:10px;color:#ffff00;text-shadow:0 0 10px #ffff00,0 0 20px #ffff00;}
+#totaltimer{font-size:16px;width:100%;text-align:center;margin-bottom:5px;color:#facc15;}
+#category{font-size:18px;color:#22c55e;margin-bottom:5px;}
+.progress{width:100%;height:8px;background:#334155;border-radius:10px;overflow:hidden;margin-top:10px;}
 .progress-bar{height:8px;width:0%;background:#22c55e;transition:0.4s;}
-.hidden{display:none;}
-.nav-btns{display:flex;justify-content:space-between;margin-top:10px;}
+.nav-btns{display:flex;justify-content:space-between;margin-top:10px;width:100%;}
 .nav-btns button{width:48%;}
+.hidden{display:none;}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login" class="card">
 <h2>Login</h2>
-<input id="username" placeholder="Username" autocomplete="off">
-<input id="password" type="password" placeholder="Password" autocomplete="off">
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
 <button id="togglePassBtn" onclick="togglePassword()">Show Password</button>
-<button onclick="login()">Login</button>
+<button id="loginBtn" onclick="login()">Login</button>
 </div>
 
-<!-- HOME -->
 <div id="home" class="card hidden">
-<h2>Welcome to IQ Quiz</h2>
+<h2>Welcome to Qurix</h2>
 <p>50 Tough IQ Questions</p>
 <button onclick="startQuiz()">Start Quiz</button>
 </div>
 
-<!-- QUIZ -->
 <div id="quiz" class="card hidden">
+<div id="totaltimer">Total Time: 50:00</div>
 <h3 id="qnumber"></h3>
+<div id="category"></div>
 <div id="timer">60</div>
 <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
 <h2 id="question"></h2>
-<div id="options"></div>
+<div id="options" style="flex-grow:1;overflow-y:auto;width:100%;"></div>
 <div class="nav-btns">
 <button onclick="prevQuestion()">Previous</button>
 <button onclick="nextQuestion()">Next</button>
 </div>
 </div>
 
-<!-- RESULT -->
 <div id="result" class="card hidden">
 <h2>Quiz Finished</h2>
 <h3 id="score"></h3>
 <button onclick="restartQuiz()">Restart</button>
 </div>
 
-<!-- sounds -->
-<audio id="correctSound"><source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
-<audio id="wrongSound"><source src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-buzz-950.mp3"></audio>
-
 <script>
+window.onload=function(){
+  let savedU=localStorage.getItem("savedUser");
+  let savedP=localStorage.getItem("savedPass");
+  if(savedU && savedP){
+    document.getElementById("username").value=savedU;
+    document.getElementById("password").value=savedP;
+  }
+}
+
 let passwordVisible=false;
 function togglePassword(){
-let p=document.getElementById("password");
-passwordVisible=!passwordVisible;
-p.type=passwordVisible?"text":"password";
-document.getElementById("togglePassBtn").innerText=passwordVisible?"Hide Password":"Show Password";
+  let p=document.getElementById("password");
+  passwordVisible=!passwordVisible;
+  p.type=passwordVisible?"text":"password";
+  document.getElementById("togglePassBtn").innerText=passwordVisible?"Hide Password":"Show Password";
 }
 
 function login(){
-let u=document.getElementById("username").value.trim();
-let p=document.getElementById("password").value.trim();
-if(u!=="" && p!==""){
-document.getElementById("login").classList.add("hidden");
-document.getElementById("home").classList.remove("hidden");
-}else{
-alert("Enter username and password");
-}
+  let u=document.getElementById("username").value.trim();
+  let p=document.getElementById("password").value.trim();
+  if(u!=="" && p!==""){
+    localStorage.setItem("savedUser",u);
+    localStorage.setItem("savedPass",p);
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("home").classList.remove("hidden");
+  }else alert("Enter username and password");
 }
 
-function startQuiz(){
-document.getElementById("home").classList.add("hidden");
-document.getElementById("quiz").classList.remove("hidden");
-loadQuestion();
-}
+let current=0, answers=[], timeLeft=60, totalTime=50*60, timerVar, totalTimerVar;
 
 let questions=[
-/* Logical 10 */
-{q:"Find next: 2,6,12,20,?",o:["30","28","32","34"],a:1},
-{q:"5 pencils cost 5 rupees, 25 pencils?",o:["25","20","30","15"],a:0},
-{q:"□△○□△ next?",o:["○","□","△","◇"],a:0},
-{q:"Riddle: I speak without mouth, hear without ears?",o:["Echo","Wind","Shadow","Sound"],a:0},
-{q:"Odd one: 3,9,27,33,81?",o:["33","27","9","3"],a:0},
-{q:"1,4,9,16,?",o:["25","20","24","30"],a:0},
-{q:"Keys but can't open locks?",o:["Piano","Map","Lock","Door"],a:0},
-{q:"Pattern: 2,3,5,8,12,?",o:["17","18","16","15"],a:0},
-{q:"A=1,B=2,...Z=26, sum of 'BAD'?",o:["7","6","5","8"],a:0},
-{q:"More you take, more left behind?",o:["Footsteps","Time","Shadow","Memory"],a:0},
-/* Planets 10 */
-{q:"Largest planet?",o:["Jupiter","Saturn","Earth","Neptune"],a:0},
-{q:"Closest to Sun?",o:["Mercury","Venus","Mars","Earth"],a:0},
-{q:"Red planet?",o:["Mars","Venus","Jupiter","Saturn"],a:0},
-{q:"Planet with rings?",o:["Saturn","Jupiter","Neptune","Uranus"],a:0},
-{q:"Dwarf planet?",o:["Pluto","Eris","Ceres","Haumea"],a:0},
-{q:"Earth's moon?",o:["Moon","Europa","Titan","Ganymede"],a:0},
-{q:"Hottest planet?",o:["Venus","Mercury","Mars","Jupiter"],a:0},
-{q:"Gas Giant?",o:["Jupiter","Mars","Earth","Venus"],a:0},
-{q:"Sun to Earth light time?",o:["8 min","12 min","10 min","5 min"],a:0},
-{q:"Nearest star?",o:["Sun","Proxima Centauri","Sirius","Alpha Centauri"],a:0},
-/* Animals 10 */
-{q:"Fastest land animal?",o:["Cheetah","Lion","Tiger","Leopard"],a:0},
-{q:"Largest mammal?",o:["Blue Whale","Elephant","Shark","Giraffe"],a:0},
-{q:"Bird that flies backwards?",o:["Hummingbird","Eagle","Parrot","Sparrow"],a:0},
-{q:"Animal with memory?",o:["Elephant","Dog","Cat","Monkey"],a:0},
-{q:"Largest reptile?",o:["Crocodile","Snake","Lizard","Turtle"],a:0},
-{q:"Fastest bird?",o:["Peregrine Falcon","Eagle","Hawk","Owl"],a:0},
-{q:"Only mammal that flies?",o:["Bat","Flying Squirrel","Colugo","Sugar Glider"],a:0},
-{q:"Heaviest land animal?",o:["Elephant","Rhino","Hippo","Giraffe"],a:0},
-{q:"King of Jungle?",o:["Lion","Tiger","Leopard","Elephant"],a:0},
-{q:"Tallest animal?",o:["Giraffe","Elephant","Camel","Horse"],a:0},
-/* Human Body 10 */
-{q:"Largest organ?",o:["Skin","Liver","Heart","Lung"],a:0},
-{q:"Strongest muscle?",o:["Masseter","Heart","Biceps","Gluteus"],a:0},
-{q:"Bone with highest fracture?",o:["Clavicle","Femur","Tibia","Radius"],a:0},
-{q:"Smallest bone?",o:["Stapes","Malleus","Incus","Femur"],a:0},
-{q:"RBC lifespan?",o:["120 days","60 days","90 days","150 days"],a:0},
-{q:"Largest artery?",o:["Aorta","Vena Cava","Pulmonary","Carotid"],a:0},
-{q:"Brain part for balance?",o:["Cerebellum","Cerebrum","Medulla","Hypothalamus"],a:0},
-{q:"Total bones?",o:["206","210","201","208"],a:0},
-{q:"Strongest tendon?",o:["Achilles","Patellar","Biceps","Triceps"],a:0},
-{q:"Strongest muscle?",o:["Heart","Gluteus","Masseter","Biceps"],a:0},
-/* Quant / Maths 10 */
-{q:"15×12?",o:["180","175","185","190"],a:0},
-{q:"√196?",o:["14","12","16","18"],a:0},
-{q:"Next:2,4,8,16,?",o:["32","30","24","28"],a:0},
-{q:"7x=84, x=?",o:["12","14","10","16"],a:0},
-{q:"25% of 200?",o:["50","40","45","60"],a:0},
-{q:"10²+10²=?",o:["200","100","120","150"],a:0},
-{q:"45×2-30=?",o:["60","70","80","50"],a:0},
-{q:"12÷1/4=?",o:["48","36","24","32"],a:0},
-{q:"7³=?",o:["343","341","342","345"],a:0},
-{q:"5!=?",o:["120","24","60","100"],a:0}
+{cat:"Logical",q:"Find next: 2,6,12,20,?", o:["30","28","32","34"], a:1},
+{cat:"Logical",q:"If 5 pencils cost 5 rupees, 25 pencils cost?", o:["25","20","30","15"], a:0},
+{cat:"Logical",q:"Which shape comes next: □△○□△ ?", o:["○","□","△","◇"], a:0},
+{cat:"Logical",q:"Riddle: I speak without a mouth, hear without ears, what am I?", o:["Echo","Wind","Shadow","Sound"], a:0},
+{cat:"Logical",q:"Find the odd one: 3,9,27,33,81", o:["33","27","9","3"], a:0},
+{cat:"Logical",q:"Which number replaces ?: 1,4,9,16,?", o:["25","20","24","30"], a:0},
+{cat:"Logical",q:"Riddle: What has keys but can't open locks?", o:["Piano","Map","Lock","Door"], a:0},
+{cat:"Logical",q:"Pattern: 2,3,5,8,12, ?", o:["17","18","16","15"], a:0},
+{cat:"Logical",q:"If A=1,B=2,...Z=26, sum of 'BAD'?", o:["7","6","5","8"], a:0},
+{cat:"Logical",q:"Riddle: The more you take, the more you leave behind?", o:["Footsteps","Time","Shadow","Memory"], a:0},
+
+{cat:"Planets/Space",q:"Largest planet?", o:["Jupiter","Saturn","Earth","Neptune"], a:0},
+{cat:"Planets/Space",q:"Closest to Sun?", o:["Mercury","Venus","Mars","Earth"], a:0},
+{cat:"Planets/Space",q:"Red planet?", o:["Mars","Venus","Jupiter","Saturn"], a:0},
+{cat:"Planets/Space",q:"Planet with rings?", o:["Saturn","Jupiter","Neptune","Uranus"], a:0},
+{cat:"Planets/Space",q:"Dwarf planet?", o:["Pluto","Eris","Ceres","Haumea"], a:0},
+{cat:"Planets/Space",q:"Earth's moon?", o:["Moon","Europa","Titan","Ganymede"], a:0},
+{cat:"Planets/Space",q:"Hottest planet?", o:["Venus","Mercury","Mars","Jupiter"], a:0},
+{cat:"Planets/Space",q:"Gas Giant?", o:["Jupiter","Mars","Earth","Venus"], a:0},
+{cat:"Planets/Space",q:"Sun to Earth light time?", o:["8 min","12 min","10 min","5 min"], a:0},
+{cat:"Planets/Space",q:"Nearest star?", o:["Sun","Proxima Centauri","Sirius","Alpha Centauri"], a:0},
+
+{cat:"Animals",q:"Fastest land animal?", o:["Cheetah","Lion","Tiger","Leopard"], a:0},
+{cat:"Animals",q:"Largest mammal?", o:["Blue Whale","Elephant","Shark","Giraffe"], a:0},
+{cat:"Animals",q:"Bird that can fly backwards?", o:["Hummingbird","Eagle","Parrot","Sparrow"], a:0},
+{cat:"Animals",q:"Animal known for memory?", o:["Elephant","Dog","Cat","Monkey"], a:0},
+{cat:"Animals",q:"Largest reptile?", o:["Crocodile","Snake","Lizard","Turtle"], a:0},
+{cat:"Animals",q:"Fastest bird?", o:["Peregrine Falcon","Eagle","Hawk","Owl"], a:0},
+{cat:"Animals",q:"Only mammal that flies?", o:["Bat","Flying Squirrel","Colugo","Sugar Glider"], a:0},
+{cat:"Animals",q:"Heaviest land animal?", o:["Elephant","Rhino","Hippo","Giraffe"], a:0},
+{cat:"Animals",q:"King of Jungle?", o:["Lion","Tiger","Leopard","Elephant"], a:0},
+{cat:"Animals",q:"Tallest animal?", o:["Giraffe","Elephant","Camel","Horse"], a:0},
+
+{cat:"Human Body",q:"Largest organ?", o:["Skin","Liver","Heart","Lung"], a:0},
+{cat:"Human Body",q:"Strongest muscle?", o:["Masseter","Heart","Biceps","Gluteus"], a:0},
+{cat:"Human Body",q:"Bone with highest fracture?", o:["Clavicle","Femur","Tibia","Radius"], a:0},
+{cat:"Human Body",q:"Smallest bone?", o:["Stapes","Malleus","Incus","Femur"], a:0},
+{cat:"Human Body",q:"RBC lifespan?", o:["120 days","60 days","90 days","150 days"], a:0},
+{cat:"Human Body",q:"Largest artery?", o:["Aorta","Vena Cava","Pulmonary","Carotid"], a:0},
+{cat:"Human Body",q:"Brain part for balance?", o:["Cerebellum","Cerebrum","Medulla","Hypothalamus"], a:0},
+{cat:"Human Body",q:"Total bones in human?", o:["206","210","201","208"], a:0},
+{cat:"Human Body",q:"Strongest tendon?", o:["Achilles","Patellar","Biceps","Triceps"], a:0},
+{cat:"Human Body",q:"Most flexible joint?", o:["Shoulder","Knee","Elbow","Wrist"], a:0},
+
+{cat:"Quant/Maths",q:"15 × 12 ?", o:["180","175","185","190"], a:0},
+{cat:"Quant/Maths",q:"√196 ?", o:["14","12","16","18"], a:0},
+{cat:"Quant/Maths",q:"Next in series:2,4,8,16,?", o:["32","30","24","28"], a:0},
+{cat:"Quant/Maths",q:"7x=84, x=?", o:["12","14","10","16"], a:0},
+{cat:"Quant/Maths",q:"25% of 200?", o:["50","40","45","60"], a:0},
+{cat:"Quant/Maths",q:"10² + 10² = ?", o:["200","100","120","150"], a:0},
+{cat:"Quant/Maths",q:"45×2-30=?", o:["60","70","80","50"], a:0},
+{cat:"Quant/Maths",q:"12 ÷ 1/4 = ?", o:["48","36","24","32"], a:0},
+{cat:"Quant/Maths",q:"7³=?", o:["343","341","342","345"], a:0},
+{cat:"Quant/Maths",q:"5!=?", o:["120","24","60","100"], a:0}
 ];
 
-let current=0, score=0, timerVar, timeLeft=60;
-
-function startTimer(){
-clearInterval(timerVar); 
-timeLeft=60;
-document.getElementById("timer").innerText=timeLeft;
-timerVar=setInterval(()=>{
-timeLeft--;
-document.getElementById("timer").innerText=timeLeft;
-if(timeLeft<=0){nextQuestion();}
-},1000);
-}
+function shuffleArray(arr){for(let i=arr.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
 
 function loadQuestion(){
-let q=questions[current];
-document.getElementById("qnumber").innerText="Question "+(current+1)+" / 50";
-document.getElementById("question").innerText=q.q;
-
-let optionsHTML="";
-q.o.forEach((opt,i)=>{
-optionsHTML+=`<div class="option" onclick="selectAnswer(this,${i})">${opt}</div>`;
-});
-document.getElementById("options").innerHTML=optionsHTML;
-document.getElementById("progressBar").style.width=(current/50*100)+"%";
-startTimer();
+  let q=questions[current];
+  document.getElementById("qnumber").innerText="Question "+(current+1)+" / "+questions.length;
+  document.getElementById("category").innerText=q.cat;
+  document.getElementById("question").innerText=q.q;
+  let opts=q.o.map((opt,i)=>({text:opt,idx:i}));
+  shuffleArray(opts);
+  let correctIdx=opts.findIndex(o=>o.idx===q.a);
+  q.correctShuffled=correctIdx;
+  let optionsHTML="";
+  opts.forEach((o,i)=>{
+    let sel=answers[current]===i?"correct":"";
+    optionsHTML+=`<div class="option ${sel}" onclick="selectAnswer(${i},this)">${o.text}</div>`;
+  });
+  document.getElementById("options").innerHTML=optionsHTML;
+  document.getElementById("progressBar").style.width=((current)/questions.length*100)+"%";
+  startQuestionTimer();
 }
 
-function selectAnswer(el,i){
-clearInterval(timerVar);
-document.querySelectorAll(".option").forEach(o=>o.classList.remove("selected"));
-el.classList.add("selected");
-if(i===questions[current].a){score++;document.getElementById("correctSound").play();}
-else{document.getElementById("wrongSound").play();}
+function selectAnswer(i,elem){
+  answers[current]=i;
+  document.querySelectorAll(".option").forEach(opt=>opt.classList.remove("correct"));
+  elem.classList.add("correct");
 }
 
-function nextQuestion(){
-if(current<49){current++;loadQuestion();}
-else{finishQuiz();}
+function nextQuestion(){if(current<questions.length-1){current++;loadQuestion();}else finishQuiz();}
+function prevQuestion(){if(current>0){current--;loadQuestion();}}
+
+function startQuestionTimer(){
+  clearInterval(timerVar);
+  timeLeft=60;
+  const timerElem=document.getElementById("timer");
+  timerElem.innerText=timeLeft;
+  timerVar=setInterval(()=>{
+    timeLeft--;
+    timerElem.innerText=timeLeft;
+    timerElem.style.color="#ffff00";
+    timerElem.style.textShadow="0 0 10px #ffff00,0 0 20px #ffff00";
+    if(timeLeft<=0) nextQuestion();
+  },1000);
 }
 
-function prevQuestion(){
-if(current>0){current--;loadQuestion();}
+function startTotalTimer(){
+  clearInterval(totalTimerVar);
+  totalTimerVar=setInterval(()=>{
+    totalTime--;
+    let min=Math.floor(totalTime/60);
+    let sec=totalTime%60;
+    const totalElem=document.getElementById("totaltimer");
+    totalElem.innerText="Total Time: "+String(min).padStart(2,'0')+":"+String(sec).padStart(2,'0');
+    if(totalTime<=0) finishQuiz();
+  },1000);
 }
 
+function startQuiz(){document.getElementById("home").classList.add("hidden");document.getElementById("quiz").classList.remove("hidden");startTotalTimer();loadQuestion();}
 function finishQuiz(){
-document.getElementById("quiz").classList.add("hidden");
-document.getElementById("result").classList.remove("hidden");
-document.getElementById("score").innerText="Correct: "+score+" / 50";
+  clearInterval(timerVar); clearInterval(totalTimerVar);
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+  let score=0;
+  for(let i=0;i<questions.length;i++){if(answers[i]===questions[i].correctShuffled) score++;}
+  document.getElementById("score").innerText="Correct: "+score+" / "+questions.length;
 }
-
-function restartQuiz(){
-current=0; score=0;
-document.getElementById("result").classList.add("hidden");
-document.getElementById("home").classList.remove("hidden");
-}
+function restartQuiz(){current=0; answers=[]; totalTime=50*60; document.getElementById("result").classList.add("hidden"); document.getElementById("home").classList.remove("hidden");}
 </script>
-
 </body>
 </html>
